@@ -1,0 +1,27 @@
+#!/bin/sh
+
+echo "Checking for cc..."
+if [ ! -x /usr/bin/cc ]; then
+	echo "Error: compiler is not found!"
+	exit 1
+fi
+
+echo "Checking for pfctl..."
+if [ ! -x /sbin/pfctl ]; then
+	echo "Error: pf is not installed or configured correctly!"
+	exit 1
+fi
+
+echo "Checking for curl..."
+if [ ! -x /usr/local/bin/curl ]; then
+	echo "Error: curl is not found!"
+	exit 1
+fi
+
+echo "Checking for pkgconf..."
+if [ ! -x /usr/local/bin/pkgconf ]; then
+	echo "Error: pkgconf is not found!"
+	exit 1
+fi
+
+echo "You may now run 'make' and 'make install'."
