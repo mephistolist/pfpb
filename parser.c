@@ -9,8 +9,15 @@
 #define BUFFER_SIZE 1024
 #define GZIP_DIR "/var/pfpb/gzips/"
 #define TABLES_DIR "/var/pfpb/tables/"
+#define GZIP_EXT ".gz"
+#define HEADER_LINES 2
 
 extern void process_files();
+
+// Helper function to create file paths
+void create_path(char *dest, size_t size, const char *dir, const char *filename) {
+    snprintf(dest, size, "%s%s", dir, filename);
+}
 
 // Function to calculate CIDR notation from an IP range
 char *convert_to_cidr(const char *range) {
@@ -56,7 +63,13 @@ char *convert_to_cidr(const char *range) {
 
 // Function to process each line of the file
 void process_line(const char *line, FILE *output_file) {
-    char *tok = strtok(strdup(line), ":");
+    char *line_copy = strdup(line);
+    if (!line_copy) {
+        perror("strdup failed");
+        return;
+    }
+
+    char *tok = strtok(line_copy, ":");
     char *range = NULL;
 
     while (tok != NULL) {
@@ -77,6 +90,8 @@ void process_line(const char *line, FILE *output_file) {
             free(cidr);
         }
     }
+
+    free(line_copy);
 }
 
 // Function to process a single gzip file
@@ -98,7 +113,7 @@ void process_gzip_file(const char *gzip_file, const char *output_file) {
     int line_count = 0;
 
     while (gzgets(gzfile, buffer, BUFFER_SIZE)) {
-        if (++line_count <= 2) {
+        if (++line_count <= HEADER_LINES) {
             continue;
         }
 
@@ -106,9 +121,12 @@ void process_gzip_file(const char *gzip_file, const char *output_file) {
         process_line(buffer, output);
     }
 
-    gzclose(gzfile);
-    fclose(output);
-    sleep(0);
+    if (gzclose(gzfile) != Z_OK) {
+        fprintf(stderr, "Error closing gzip file: %s\n", gzip_file);
+    }
+    if (fclose(output) != 0) {
+        perror("fclose failed");
+    }
 }
 
 // Main function to process all gzip files in the directory
@@ -126,13 +144,13 @@ int parser_main() {
             const char *filename = entry->d_name;
             const char *extension = strrchr(filename, '.');
 
-            if (extension && strcmp(extension, ".gz") == 0) {
+            if (extension && strcmp(extension, GZIP_EXT) == 0) {
                 char gzip_path[BUFFER_SIZE], output_path[BUFFER_SIZE];
-                snprintf(gzip_path, BUFFER_SIZE, "%s%s", GZIP_DIR, filename);
-                snprintf(output_path, BUFFER_SIZE, "%s%s", TABLES_DIR, filename);
+                create_path(gzip_path, BUFFER_SIZE, GZIP_DIR, filename);
+                create_path(output_path, BUFFER_SIZE, TABLES_DIR, filename);
 
                 // Remove the ".gz" extension for the output file
-                output_path[strlen(output_path) - 3] = '\0';
+                output_path[strlen(output_path) - strlen(GZIP_EXT)] = '\0';
 
                 process_gzip_file(gzip_path, output_path);
             }
