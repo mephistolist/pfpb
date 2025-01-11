@@ -41,12 +41,12 @@ This program will always need to be ran as root/sudo/doas to ensure it can make 
 
 ```
 $ pfpb
-Error: This program must be run as root.
+This program must be run as root.
 ```
 
-Some may ask, what purpose does this software serve? Have not VPNs eliminated the need for peer blocking software? Is it not true most of them no longer work? The lists used by this software are taken from https://www.iblocklist.com/lists. If you view the different paid vs free lists, you will probably see why a paid subscription is much better at protecting privacy. So if you want better privacy it will cost just a few dollars a year. It has also been shown time and time ago that VPN providers who claim to not keep logs are often not telling the truth. Even if it is true, this does not stop forensics done on memory. So you may use this software with a VPN to gain even more privacy.
+Some may ask, what purpose does this software serve? Have not VPNs eliminated the need for peer blocking software? Is it not true most of them no longer work? The lists used by this software are taken from https://www.iblocklist.com/lists. If you view the different paid vs free lists, you will probably see why a paid subscription is much better at protecting privacy. So if you want better privacy it will cost just a few dollars a year. It has also been shown time and time ago that VPN providers who claim to not keep logs are often not telling the truth. Even if it is true, this does not stop forensics done on memory. So you may use this software with a VPN to gain even more privacy as an extra layer of protection. 
 
-There are also the lists from https://www.iblocklist.com/lists?category=country, which can allow one to block an entire country. While this is usually a horrible to do in Linux, the pf firewall can handle 50,000 ips the same way it handles 5. This software will also convert ip ranges to cidr subnet notation, making the job even easier. 
+There are also the lists from https://www.iblocklist.com/lists?category=country, which can allow one to block an entire country. While this is usually a horrible to do in Linux, the pf firewall can handle 50,000 ips the same way it handles 5. This software will also convert ip ranges to cidr subnet notation, making the job even easier.
 
 This software comes only with the free lists from iblocklist.com. If you wish to add more you may edit /var/pfpb/config.txt. You will find entries inside it like this:
 
@@ -58,7 +58,6 @@ http://list.iblocklist.com/?list=zbdlwrqkabxbcppvrnos&fileformat=p2p&archiveform
 http://list.iblocklist.com/?list=xpbqleszmajjesnzddhv&fileformat=p2p&archiveformat=gz;dshield
 http://list.iblocklist.com/?list=imlmncgrkbnacgcwfjvh&fileformat=p2p&archiveformat=gz;edu
 http://list.iblocklist.com/?list=ficutxiwawokxlcyoeye&fileformat=p2p&archiveformat=gz;forum-spam
-http://list.iblocklist.com/?list=jhaoawihmfxgnvmaqffp&fileformat=p2p&archiveformat=gz;for-non-lan-computers
 http://list.iblocklist.com/?list=usrcshglbiilevmyfhse&fileformat=p2p&archiveformat=gz;hijacked
 http://list.iblocklist.com/?list=pwqnlynprfgtjbgqoizj&fileformat=p2p&archiveformat=gz;iana-multicast
 http://list.iblocklist.com/?list=cslpybexmxyuacbyuvib&fileformat=p2p&archiveformat=gz;iana-private
@@ -73,5 +72,36 @@ http://list.iblocklist.com/?list=llvtlsjyoyiczbkjsxpf&fileformat=p2p&archiveform
 http://list.iblocklist.com/?list=ghlzqtqxnzctvvajwwag&fileformat=p2p&archiveformat=gz;webexploit
 ```
 
-To add or change any lists you can just enter another line in this file with the URL to the list followed by a semicolon and the name of the list, or what you wish to call it. Then you will need to restart pfpb and do a new update to apply the new list. 
+To add or change any lists you can just enter another line in this file with the URL to the list followed by a semicolon and the name of the list, or what you wish to call it. Then you will need to restart pfpb and do a new update to apply the new list. The names on the left will also be the name of the corresponding table created for it with pf:
 
+```
+# pfctl -sT
+ads
+anti-infringement
+bad-peers
+bogon
+drop
+dshield
+edu
+exclusions
+for-non-lan-computers
+forum-spam
+government
+hijacked
+iana-multicast
+iana-private
+iana-reserved
+level1
+level2
+level3
+malicious
+microsoft
+piracy-related
+prime
+proxy
+spider
+spyware
+webexploit
+```
+
+This software should work on any BSD, but has only been tested on FreeBSD 14.2 at this time.
