@@ -73,7 +73,6 @@ cp -v config.txt /var/pfpb
 config.txt -> /var/pfpb/config.txt
 touch /tmp/original_entries.txt
 install -m 755 pfpb /usr/sbin/pfpb
-pfpb start >/dev/null
 pfpb update
 Retrieving updates and reloading. Please wait...
 Processing lists. Please wait...
