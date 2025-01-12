@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
@@ -21,7 +20,7 @@ void sort_file(const char *filename) {
     }
 }
 
-void process_files() {
+void process_files(void) {
     struct dirent *entry;
     DIR *dp = opendir(TABLES_DIR);
 
