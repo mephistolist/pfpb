@@ -29,9 +29,12 @@ install: $(TARGET)
 	mkdir -p /var/pfpb/gzips
 	mkdir -p /var/pfpb/tables
 	cp -v config.txt /var/pfpb
+	touch /tmp/original_entries.txt
 	install -m 755 $(TARGET) /usr/sbin/$(TARGET)
+	@pfpb start >/dev/null
 	pfpb update
-	Install is complete.
+	@pfpb stop >/dev/null
+	@echo "Install is complete."
 
 # Clean rule to remove generated files
 clean:
