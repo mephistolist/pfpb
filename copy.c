@@ -13,7 +13,7 @@
 #define GZIP_DIR "/var/pfpb/gzips"
 #define BUFFER_SIZE 8192
 
-extern int parser_main();
+extern int parser_main(void);
 
 void ensure_directory_exists(const char *path) {
     char *dir_path = strdup(path); // Create a modifiable copy of the path
@@ -160,7 +160,7 @@ int calculate_md5(const char *filename, unsigned char *result) {
     return 0;
 }
 
-int copy_main() {
+int copy_main(void) {
     DIR *tmp_dir = opendir(TMP_DIR);
     if (!tmp_dir) {
         perror("opendir");
