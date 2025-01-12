@@ -12,8 +12,8 @@
 extern int pfcount_main();
 
 // Function prototypes
-void load_pf_tables();
-void flush_pf_tables();
+void load_pf_tables(DIR *dp);
+void flush_pf_tables(DIR *dp);
 int loader_main(const char *mode);
 
 // Executes pfctl to load a table
@@ -44,14 +44,8 @@ void execute_pfctl_flush(const char *filename) {
 }
 
 // Loads all tables from the directory
-void load_pf_tables() {
+void load_pf_tables(DIR *dp) {
     struct dirent *entry;
-    DIR *dp = opendir(TABLES_DIR);
-
-    if (dp == NULL) {
-        perror("opendir");
-        exit(EXIT_FAILURE);
-    }
 
     while ((entry = readdir(dp)) != NULL) {
         // Skip "." and ".."
@@ -62,19 +56,11 @@ void load_pf_tables() {
         // Execute pfctl for each file
         execute_pfctl_load(entry->d_name);
     }
-
-    closedir(dp);
 }
 
 // Flushes all tables from the directory
-void flush_pf_tables() {
+void flush_pf_tables(DIR *dp) {
     struct dirent *entry;
-    DIR *dp = opendir(TABLES_DIR);
-
-    if (dp == NULL) {
-        perror("opendir");
-        exit(EXIT_FAILURE);
-    }
 
     while ((entry = readdir(dp)) != NULL) {
         // Skip "." and ".."
@@ -85,26 +71,30 @@ void flush_pf_tables() {
         // Execute pfctl for each file
         execute_pfctl_flush(entry->d_name);
     }
-
-    closedir(dp);
 }
 
 // Main loader function to be called
 int loader_main(const char *mode) {
-    if (strcmp(mode, "start") == 0) {
-        //printf("Loading PF tables from %s...\n", TABLES_DIR);
-        load_pf_tables();
-	pfcount_main();
-        printf("Done.\n");
-    } else if (strcmp(mode, "stop") == 0) {
-        //printf("Flushing PF tables from %s...\n", TABLES_DIR);
-        flush_pf_tables();
-	pfcount_main();
-        printf("Done.\n");
-    } else {
-        fprintf(stderr, "Unknown mode: %s\n", mode);
+    DIR *dp = opendir(TABLES_DIR);
+    if (dp == NULL) {
+        perror("opendir");
         return EXIT_FAILURE;
     }
 
+    if (strcmp(mode, "start") == 0) {
+        load_pf_tables(dp);
+        pfcount_main();
+        printf("Done.\n");
+    } else if (strcmp(mode, "stop") == 0) {
+        flush_pf_tables(dp);
+        pfcount_main();
+        printf("Done.\n");
+    } else {
+        fprintf(stderr, "Unknown mode: %s\n", mode);
+        closedir(dp);
+        return EXIT_FAILURE;
+    }
+
+    closedir(dp);
     return EXIT_SUCCESS;
 }
