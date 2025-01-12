@@ -92,6 +92,15 @@ void set_table_entries(const int *value) {
     }
 }
 
+void run_quiet(const char *command) {
+    int ret = system(command);
+    if (ret == -1) {
+        perror("system");
+    } /*else if (WIFEXITED(ret) && WEXITSTATUS(ret) != 0) {
+        fprintf(stderr, "Command failed with exit code %d: %s\n", WEXITSTATUS(ret), command);
+    }*/
+}
+
 int main(int argc, char *argv[]) {
     // Check if the program is being run as root
     if (geteuid() != 0) {
@@ -163,8 +172,10 @@ void stop_function() {
 }
 
 void update_function() {
-    printf("Retrieving updates. Please wait...\n");
+    printf("Retrieving updates and reloading. Please wait...\n");
     retrieve_main();
+    system("pfpb stop >/dev/null");
+    system("pfpb start >/dev/null");
     printf("Updating is complete.\n");
     pfcount_main();
 }
