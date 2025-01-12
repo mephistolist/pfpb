@@ -1,4 +1,3 @@
-
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -pedantic -O2 -pipe -march=native --std=c17 -march=native -fPIC -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Wformat-security -flto -fvisibility=hidden -fno-common -Wshadow -fstrict-aliasing -Wuninitialized
 CFLAGS_RETRIEVE = $(CFLAGS) `pkg-config --cflags libcurl`
