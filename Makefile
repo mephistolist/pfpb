@@ -31,8 +31,9 @@ install: $(TARGET)
 	cp -v config.txt /var/pfpb
 	touch /tmp/original_entries.txt
 	install -m 755 $(TARGET) /usr/sbin/$(TARGET)
+	@echo "Retrieving default free lists. Please wait..."
 	@pfpb start >/dev/null
-	pfpb update
+	@pfpb update >/dev/null
 	@pfpb stop >/dev/null
 	@echo "Install is complete."
 
