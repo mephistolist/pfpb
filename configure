@@ -24,4 +24,4 @@ if [ ! -x /usr/local/bin/pkgconf ]; then
 	exit 1
 fi
 
-echo "You may now run 'make install update'."
+echo "You may now run 'make install clean'."
