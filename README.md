@@ -17,7 +17,7 @@ Once installed you will need to run the following as root to set up pf:
 # sysrc pf_enable="YES"
 pf_enable: NO -> YES
 ```
-You will need to have some kind of /etc/pf.conf for pf and this program to work. If you are unfamilar with this, you may like the following and edit for your needs:
+You will need to have some kind of /etc/pf.conf for pf and this program to work. If you are unfamilar with this, you may use something like the following and edit for your needs:
 
 ```
 # Skip filtering on the loopback interface
