@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <dirent.h>
@@ -45,5 +46,5 @@ void process_files() {
     }
 
     closedir(dp);
-    printf("Done.\n");
+    printf("Processing Lists Complete.\n");
 }
