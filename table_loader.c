@@ -9,7 +9,7 @@
 #define TABLES_DIR "/var/pfpb/tables/"
 #define PFCTL_CMD "pfctl"
 
-extern int pfcount_main();
+extern int pfcount_main(void);
 
 // Function prototypes
 void load_pf_tables(DIR *dp);
