@@ -1,6 +1,10 @@
 # pfpb
 Packet Filter Peer Blocker
 
+Some may ask, what purpose does this software serve? Have not VPNs eliminated the need for peer blocking software? Is it not true most of them no longer work? The lists used by this software are taken from https://www.iblocklist.com/lists. If you view the different paid vs free lists, you will probably see why a paid subscription is much better at protecting privacy. So if you want better privacy it will cost just a few dollars a year. It has also been shown time and time ago that VPN providers who claim to not keep logs are often not telling the truth. Even if it is true, this does not stop forensics done on memory. So you may use this software with a VPN to gain even more privacy as an extra layer of protection.
+
+There are also the lists from https://www.iblocklist.com/lists?category=country, which can allow one to block an entire country. While this is usually a horrible to do in Linux, the pf firewall can handle 50,000 ips the same way it handles 5. This software will also convert ip ranges to cidr subnet notation, making the job even easier.
+
 This software requires the following dependencies you may install as root like this:
 
 ```
@@ -94,11 +98,7 @@ $ pfpb
 This program must be run as root.
 ```
 
-Some may ask, what purpose does this software serve? Have not VPNs eliminated the need for peer blocking software? Is it not true most of them no longer work? The lists used by this software are taken from https://www.iblocklist.com/lists. If you view the different paid vs free lists, you will probably see why a paid subscription is much better at protecting privacy. So if you want better privacy it will cost just a few dollars a year. It has also been shown time and time ago that VPN providers who claim to not keep logs are often not telling the truth. Even if it is true, this does not stop forensics done on memory. So you may use this software with a VPN to gain even more privacy as an extra layer of protection. 
-
-There are also the lists from https://www.iblocklist.com/lists?category=country, which can allow one to block an entire country. While this is usually a horrible to do in Linux, the pf firewall can handle 50,000 ips the same way it handles 5. This software will also convert ip ranges to cidr subnet notation, making the job even easier.
-
-This software comes only with the free lists from iblocklist.com. If you wish to add more you may edit /var/pfpb/config.txt. You will find entries inside it like this:
+By default, this software comes only with the free lists from iblocklist.com. If you wish to add more you may edit /var/pfpb/config.txt. You will find entries inside it like this:
 
 ```
 http://list.iblocklist.com/?list=imlmncgrkbnacgcwfjvh&fileformat=p2p&archiveformat=gz;ads
@@ -122,7 +122,7 @@ http://list.iblocklist.com/?list=llvtlsjyoyiczbkjsxpf&fileformat=p2p&archiveform
 http://list.iblocklist.com/?list=ghlzqtqxnzctvvajwwag&fileformat=p2p&archiveformat=gz;webexploit
 ```
 
-To add or change any lists you can just enter another line in this file with the URL to the list followed by a semicolon and the name of the list, or what you wish to call it. Then you will need to restart pfpb and do a new update to apply the new list. The names on the left will also be the name of the corresponding table created for it with pf:
+To add or change any lists you can just enter another line in this file with the URL to the list followed by a semicolon and the name of the list, or what you wish to call it. Then you will need to restart pfpb and do a new update to apply any new lists. The names on the left will also be the name of the corresponding table created for it with pf:
 
 ```
 # pfctl -sT
