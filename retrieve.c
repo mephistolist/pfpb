@@ -8,8 +8,13 @@
 
 #define OUTPUT_DIR "/tmp/"
 
-extern int copy_main();
+// Function prototype for copy_main
+extern int copy_main(void);
 
+// Function prototype for initialize_curl_handle
+CURL *initialize_curl_handle(void);
+
+// Function to write data to the file
 static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
     size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
     return written;
@@ -25,13 +30,13 @@ void trim_trailing_whitespace(char *str) {
 }
 
 // Function to initialize curl handle with settings
-CURL *initialize_curl_handle() {
+CURL *initialize_curl_handle(void) {
     CURL *curl_handle = curl_easy_init();
     if (!curl_handle) {
         fprintf(stderr, "Failed to initialize CURL\n");
         return NULL;
     }
-    
+
     // Set CURL options that don't change per request
     curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_data);
@@ -81,7 +86,7 @@ int retrieve(const char *name, const char *url) {
     return 0;
 }
 
-int retrieve_main() {
+int retrieve_main(void) {
     FILE *config_file = fopen("/var/pfpb/config.txt", "r");
     if (!config_file) {
         perror("Error opening config file");
