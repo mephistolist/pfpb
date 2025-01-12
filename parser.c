@@ -12,7 +12,7 @@
 #define GZIP_EXT ".gz"
 #define HEADER_LINES 2
 
-extern void process_files();
+extern void process_files(void);
 
 // Helper function to create file paths
 void create_path(char *dest, size_t size, const char *dir, const char *filename) {
@@ -130,7 +130,7 @@ void process_gzip_file(const char *gzip_file, const char *output_file) {
 }
 
 // Main function to process all gzip files in the directory
-int parser_main() {
+int parser_main(void) {
     DIR *dir = opendir(GZIP_DIR);
     if (!dir) {
         perror("opendir failed");
