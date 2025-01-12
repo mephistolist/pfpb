@@ -24,6 +24,20 @@ void trim_trailing_whitespace(char *str) {
     }
 }
 
+// Function to initialize curl handle with settings
+CURL *initialize_curl_handle() {
+    CURL *curl_handle = curl_easy_init();
+    if (!curl_handle) {
+        fprintf(stderr, "Failed to initialize CURL\n");
+        return NULL;
+    }
+    
+    // Set CURL options that don't change per request
+    curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_data);
+    return curl_handle;
+}
+
 int retrieve(const char *name, const char *url) {
     CURL *curl_handle;
     char gzip_path[1024];
@@ -34,17 +48,14 @@ int retrieve(const char *name, const char *url) {
 
     // Initialize libcurl
     curl_global_init(CURL_GLOBAL_ALL);
-    curl_handle = curl_easy_init();
-
+    curl_handle = initialize_curl_handle();
     if (!curl_handle) {
-        fprintf(stderr, "Failed to initialize CURL for %s\n", name);
+        curl_global_cleanup();
         return 1;
     }
 
-    // Set CURL options
+    // Set CURL-specific options per request
     curl_easy_setopt(curl_handle, CURLOPT_URL, url);
-    curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1L);
-    curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_data);
 
     // Open file for writing
     pagefile = fopen(gzip_path, "wb");
