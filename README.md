@@ -11,7 +11,7 @@ This software requires the following dependencies you may install as root like t
 # pkg install curl pkgconf
 ```
 
-Once installed you will need to run the following as root:
+Once installed you will need to run the following as root to set up pf:
 
 ```
 # sysrc pf_enable="YES"
