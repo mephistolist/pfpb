@@ -10,17 +10,17 @@
 
 // External function declarations
 extern int loader_main(const char *mode);
-extern int retrieve_main();
-extern int pfcount_main();
+extern int retrieve_main(void);
+extern int pfcount_main(void);
 
 // Function prototypes
-void start_function();
-void stop_function();
-void update_function();
+void start_function(void);
+void stop_function(void);
+void update_function(void);
 void print_usage(const char *program_name);
 int save_original_entries(const int *value);
 int load_original_entries(int *value);
-int get_table_entries();
+int get_table_entries(void);
 void set_table_entries(const int *value);
 
 void print_usage(const char *program_name) {
@@ -60,7 +60,7 @@ int load_original_entries(int *value) {
 }
 
 // Function to get the current value of table-entries
-int get_table_entries() {
+int get_table_entries(void) {
     FILE *fp = popen("pfctl -sm | awk '/table-entries/ { print $4 }'", "r");
     if (!fp) {
         perror("popen failed");
@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
 }
 
-void start_function() {
+void start_function(void) {
     // Get the current value of table-entries
     int original_entries = get_table_entries();
     if (original_entries == -1) {
@@ -154,7 +154,7 @@ void start_function() {
     }
 }
 
-void stop_function() {
+void stop_function(void) {
     // Load the original value from the temp file
     int original_entries;
     if (load_original_entries(&original_entries) != 0) {
@@ -171,7 +171,7 @@ void stop_function() {
     }
 }
 
-void update_function() {
+void update_function(void) {
     printf("Retrieving updates and reloading. Please wait...\n");
     retrieve_main();
     system("pfpb stop >/dev/null");
