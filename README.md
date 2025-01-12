@@ -1,11 +1,10 @@
 # pfpb
 Packet Filter Peer Blocker
 
-This software requires the following dependencies:
+This software requires the following dependencies you may install as root like this:
 
 ```
-pkgconf
-curl
+# pkg install curl pkgconf
 ```
 
 Once installed you will need to run the following as root:
@@ -73,12 +72,7 @@ cp -v config.txt /var/pfpb
 config.txt -> /var/pfpb/config.txt
 touch /tmp/original_entries.txt
 install -m 755 pfpb /usr/sbin/pfpb
-pfpb update
-Retrieving updates and reloading. Please wait...
-Processing lists. Please wait...
-Processing Lists Complete.
-Updating is complete.
-Total IP Ranges Blocked: 649616
+Retrieving default free lists. Please wait...
 Install is complete.
 rm -f retrieve.o copy.o parser.o dupe_parse.o table_loader.o pfcount.o main.o pfpb
 ```
