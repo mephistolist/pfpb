@@ -20,7 +20,7 @@ unsigned long count_lines_from_command(const char *command) {
     return line_count;
 }
 
-int pfcount_main() {
+int pfcount_main(void) {
     const char *command = "for i in $(pfctl -sT); do pfctl -t $i -T show; done";
     unsigned long total_ips = count_lines_from_command(command);
 
