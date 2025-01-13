@@ -33,7 +33,7 @@ install: $(TARGET)
 	install -m 755 $(TARGET) /usr/sbin/$(TARGET)
 	@echo "Retrieving default free lists. Please wait..."
 	@pfpb start >/dev/null
-	@pfpb update >/dev/null
+	@pfpb update >/dev/null 2>/dev/null
 	@pfpb stop >/dev/null
 	@echo "Install is complete."
 
