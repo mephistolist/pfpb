@@ -9,6 +9,8 @@ Some may ask, what purpose does this software serve? Have not VPNs eliminated th
 
 There are also the lists from https://www.iblocklist.com/lists?category=country, which can allow one to block an entire country. While this is usually a horrible to do in Linux, the pf firewall can handle 50,000 ips the same way it handles 5. This software will also convert ip ranges to cidr subnet notation, making the job even easier.
 
+Most of what this software does is take the lists mentioned and converts them to CIDR notation. These lists originally come ip ranges in hypenated ranges like 127.0.0.1-127.0.0.7, which iptables would accept. However, the pf firewall will only accept ip ranges in CIDR notation. This software is not a deamon, but passes information to the pf firewall to help automate the functions of other peer blocking software like this. 
+
 # Usage
 These are the only command options:
 
