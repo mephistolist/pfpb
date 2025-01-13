@@ -9,14 +9,15 @@ Some may ask, what purpose does this software serve? Have not VPNs eliminated th
 
 There are also the lists from https://www.iblocklist.com/lists?category=country, which can allow one to block an entire country. While this is usually a horrible to do in Linux, the pf firewall can handle 50,000 ips the same way it handles 5. This software will also convert ip ranges to cidr subnet notation, making the job even easier.
 
+# Usage
 These are the only command options:
 
 ```
 Usage: pfpb <command>
 Commands:
- pfpb start   Start loading PF tables
- pfpb stop    Stop (flush) PF tables
- pfpb update  Update any new blocklists
+ pfpb start -  Start load the PF tables containing ip ranges from iblocklist to block.
+ pfpb stop  -  Stop all PF tables with ips ranges from being blocked. 
+ pfpb update - Update any new blocklists so if any new ip ranges exist, they can be applied.
 ```
 
 This program will always need to be ran as root/sudo/doas to ensure it can make changes to the pf firewall. Failure to do so will result in this message:
@@ -82,4 +83,4 @@ spyware
 webexploit
 ```
 
-This software should work on any BSD, but has only been tested on FreeBSD 14.2 at this time.
+This software should work on any BSD, but has only been tested on FreeBSD 14.2 and HardenedBSD 14.2 at this time.
