@@ -97,7 +97,7 @@ void run_quiet(const char *command) {
     if (ret == -1) {
         perror("system");
     } /*else if (WIFEXITED(ret) && WEXITSTATUS(ret) != 0) {
-        fprintf(stderr, "Command failed with exit code %d: %s\n", WEXITSTATUS(ret), command);
+        fprintf(stderr, "Command failed with exit code %d: %s\n", WEXITSTATUS(ret), ;
     }*/
 }
 
@@ -172,7 +172,7 @@ void stop_function(void) {
 }
 
 void update_function(void) {
-    printf("Retrieving updates and reloading. Please wait...\n");
+    printf("Retrieving updates.\nPlease wait...\n");
     retrieve_main();
     system("pfpb stop >/dev/null");
     system("pfpb start >/dev/null");
