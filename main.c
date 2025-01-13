@@ -26,9 +26,9 @@ void set_table_entries(const int *value);
 void print_usage(const char *program_name) {
     printf("Usage: %s <command>\n", program_name);
     printf("Commands:\n");
-    printf(" pfpb start   Start loading PF tables\n");
-    printf(" pfpb stop    Stop (flush) PF tables\n");
-    printf(" pfpb update  Update any new blocklists\n");
+    printf(" pfpb start -  Start load the PF tables containing ip ranges from iblocklist to block.\n");
+    printf(" pfpb stop  -  Stop all PF tables with ips ranges from being blocked.\n");
+    printf(" pfpb update - Update any new blocklists so if any new ip ranges exist, they can be applied.\n");
 }
 
 // Function to save the original table-entries value to a file
@@ -97,7 +97,7 @@ void run_quiet(const char *command) {
     if (ret == -1) {
         perror("system");
     } /*else if (WIFEXITED(ret) && WEXITSTATUS(ret) != 0) {
-        fprintf(stderr, "Command failed with exit code %d: %s\n", WEXITSTATUS(ret), ;
+        fprintf(stderr, "Command failed with exit code %d: %s\n", WEXITSTATUS(ret), command);
     }*/
 }
 
