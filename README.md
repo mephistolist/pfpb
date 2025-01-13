@@ -85,4 +85,16 @@ spyware
 webexploit
 ```
 
+If you desire, one can set up a root cron job to start these at boot:
+
+```
+@reboot pfpb start
+```
+
+You can also automate updating. Something like the follow as a root cron job will update every day at 3am:
+
+```
+0 3 * * *
+```
+
 This software should work on any BSD, but has only been tested on FreeBSD 14.2 and HardenedBSD 14.2 at this time.
