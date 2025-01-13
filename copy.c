@@ -53,7 +53,7 @@ void move_file(const char *src, const char *dest) {
     struct stat dest_stat;
     char final_dest[PATH_MAX];
     if (stat(dest, &dest_stat) == 0 && S_ISDIR(dest_stat.st_mode)) {
-        snprintf(final_dest, sizeof(final_dest), "%s/%s", dest, basename((char *)src));
+        snprintf(final_dest, sizeof(final_dest), "%s/%s", dest, basename((char *)src;
     } else {
         snprintf(final_dest, sizeof(final_dest), "%s", dest);
     }
@@ -167,6 +167,8 @@ int copy_main(void) {
     }
 
     struct dirent *entry;
+    int updates_found = 0; // Flag to track updates
+
     while ((entry = readdir(tmp_dir)) != NULL) {
         if (strstr(entry->d_name, ".gz") == NULL) {
             continue;
@@ -174,8 +176,8 @@ int copy_main(void) {
 
         char tmp_file_path[PATH_MAX];
         char gzip_file_path[PATH_MAX];
-        snprintf(tmp_file_path, sizeof(tmp_file_path), "%s/%s", TMP_DIR, entry->d_name);
-        snprintf(gzip_file_path, sizeof(gzip_file_path), "%s/%s", GZIP_DIR, entry->d_name);
+        snprintf(tmp_file_path, sizeof(tmp_file_path), "%s/%s", TMP_DIR, entry->d_na;
+        snprintf(gzip_file_path, sizeof(gzip_file_path), "%s/%s", GZIP_DIR, entry->d;
 
         unsigned char tmp_md5[EVP_MAX_MD_SIZE];
         unsigned char gzip_md5[EVP_MAX_MD_SIZE];
@@ -192,7 +194,7 @@ int copy_main(void) {
             }
 
             if (memcmp(tmp_md5, gzip_md5, EVP_MD_size(EVP_md5())) == 0) {
-                // Skip identical files without printing anything
+                // Skip identical files
                 continue;
             }
         }
@@ -200,7 +202,7 @@ int copy_main(void) {
         // Get the basename and remove the ".gz" extension
         char *basename_file = basename(entry->d_name);
         char file_name_without_gz[PATH_MAX];
-	snprintf(file_name_without_gz, sizeof(file_name_without_gz), "%s", basename_file);
+        snprintf(file_name_without_gz, sizeof(file_name_without_gz), "%s", basename_;
 
         // Remove the .gz suffix
         char *gz_ext = strstr(file_name_without_gz, ".gz");
@@ -210,9 +212,16 @@ int copy_main(void) {
 
         printf("Updating %s\n", file_name_without_gz);
         move_file(tmp_file_path, gzip_file_path);
+        updates_found = 1; // Mark that an update was found
     }
 
     closedir(tmp_dir);
+
+    if (!updates_found) {
+        printf("No updates were found.\nAll files are up-to-date.\n");
+        exit(EXIT_SUCCESS);
+    }
+
     parser_main();
     return EXIT_SUCCESS;
 }
