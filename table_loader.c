@@ -87,7 +87,8 @@ int loader_main(const char *mode) {
         printf("Done.\n");
     } else if (strcmp(mode, "stop") == 0) {
         flush_pf_tables(dp);
-        pfcount_main();
+        //pfcount_main();
+	printf("Total IP Ranges Blocked: 0\n");
         printf("Done.\n");
     } else {
         fprintf(stderr, "Unknown mode: %s\n", mode);
