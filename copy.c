@@ -83,7 +83,7 @@ void move_file(const char *src, const char *dest) {
         perror("unlink source file");
     }
 }
-int calculate_md5(const char *filename, unsigned char *result) {
+int calculate_sha256(const char *filename, unsigned char *result, unsigned int *result_len) {
     EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
     if (!mdctx) {
         perror("EVP_MD_CTX_new");
@@ -95,7 +95,7 @@ int calculate_md5(const char *filename, unsigned char *result) {
         EVP_MD_CTX_free(mdctx);
         return -1;
     }
-    const EVP_MD *md = EVP_md5();
+    const EVP_MD *md = EVP_sha256();
     if (EVP_DigestInit_ex(mdctx, md, NULL) != 1) {
         perror("EVP_DigestInit_ex");
         fclose(file);
@@ -118,7 +118,7 @@ int calculate_md5(const char *filename, unsigned char *result) {
         EVP_MD_CTX_free(mdctx);
         return -1;
     }
-    if (EVP_DigestFinal_ex(mdctx, result, NULL) != 1) {
+    if (EVP_DigestFinal_ex(mdctx, result, result_len) != 1) {
         perror("EVP_DigestFinal_ex");
         fclose(file);
         EVP_MD_CTX_free(mdctx);
@@ -144,19 +144,20 @@ int copy_main(void) {
         char gzip_file_path[PATH_MAX];
         snprintf(tmp_file_path, sizeof(tmp_file_path), "%s/%s", TMP_DIR, entry->d_name);
         snprintf(gzip_file_path, sizeof(gzip_file_path), "%s/%s", GZIP_DIR, entry->d_name);
-        unsigned char tmp_md5[EVP_MAX_MD_SIZE];
-        unsigned char gzip_md5[EVP_MAX_MD_SIZE];
-        if (calculate_md5(tmp_file_path, tmp_md5) != 0) {
-            fprintf(stderr, "Failed to calculate MD5 for %s\n", tmp_file_path);
+        unsigned char tmp_sha[EVP_MAX_MD_SIZE];
+        unsigned char gzip_sha[EVP_MAX_MD_SIZE];
+        unsigned int tmp_len = 0, gzip_len = 0;
+        if (calculate_sha256(tmp_file_path, tmp_sha, &tmp_len) != 0) {
+            fprintf(stderr, "Failed to calculate SHA-256 for %s\n", tmp_file_path);
             continue;
         }
         if (access(gzip_file_path, F_OK) == 0) {
-            if (calculate_md5(gzip_file_path, gzip_md5) != 0) {
-                fprintf(stderr, "Failed to calculate MD5 for %s\n", gzip_file_path);
+            if (calculate_sha256(gzip_file_path, gzip_sha, &gzip_len) != 0) {
+                fprintf(stderr, "Failed to calculate SHA-256 for %s\n", gzip_file_path);
                 continue;
             }
-            if (memcmp(tmp_md5, gzip_md5, EVP_MD_size(EVP_md5())) == 0) {
-                continue;
+            if (tmp_len == gzip_len && memcmp(tmp_sha, gzip_sha, tmp_len) == 0) {
+                continue; // No changes, skip
             }
         }
         char *base = basename(entry->d_name);
