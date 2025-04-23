@@ -3,12 +3,15 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
+#include <sys/wait.h>
+
 #define TMP_FILE "/tmp/original_entries.txt"
 #define DEFAULT_TABLE_ENTRIES 1000000
-// External function declarations
+
 extern int loader_main(const char *mode);
 extern int retrieve_main(void);
 extern int pfcount_main(void);
+
 // Function prototypes
 void start_function(void);
 void stop_function(void);
@@ -18,7 +21,8 @@ int save_original_entries(const int *value);
 int load_original_entries(int *value);
 int get_table_entries(void);
 void set_table_entries(const int *value);
-void run_quiet(const char *command);
+void run_quiet(const char *cmd_path, char *const argv[]);
+
 void print_usage(const char *program_name) {
     printf("Usage: %s <command>\n", program_name);
     printf("Commands:\n");
@@ -26,6 +30,7 @@ void print_usage(const char *program_name) {
     printf("  pfpb stop   - Stop all PF tables and unblock IP ranges.\n");
     printf("  pfpb update - Update any new blocklists so if any new IP ranges exist, they can be applied.\n");
 }
+
 int save_original_entries(const int *value) {
     FILE *fp = fopen(TMP_FILE, "w");
     if (!fp) {
@@ -36,6 +41,7 @@ int save_original_entries(const int *value) {
     fclose(fp);
     return 0;
 }
+
 int load_original_entries(int *value) {
     FILE *fp = fopen(TMP_FILE, "r");
     if (!fp) {
@@ -50,6 +56,7 @@ int load_original_entries(int *value) {
     fclose(fp);
     return 0;
 }
+
 int get_table_entries(void) {
     FILE *fp = popen("pfctl -sm | awk '/table-entries/ { print $4 }'", "r");
     if (!fp) {
@@ -67,20 +74,53 @@ int get_table_entries(void) {
     pclose(fp);
     return table_entries;
 }
+
 void set_table_entries(const int *value) {
-    char command[256];
-    snprintf(command, sizeof(command),
-             "echo \"set limit { table-entries %d }\" | pfctl -f -", *value);
-    if (system(command) != 0) {
-        fprintf(stderr, "Failed to set table-entries to %d\n", *value);
+    int pipefd[2];
+    if (pipe(pipefd) == -1) {
+        perror("pipe");
+        return;
+    }
+    pid_t pid = fork();
+    if (pid == -1) {
+        perror("fork");
+        close(pipefd[0]);
+        close(pipefd[1]);
+        return;
+    } else if (pid == 0) {
+        // Child process
+        close(pipefd[1]);
+        dup2(pipefd[0], STDIN_FILENO);
+        close(pipefd[0]);
+        execl("/sbin/pfctl", "pfctl", "-f", "-", (char *)NULL);
+        perror("execl");
+        _exit(EXIT_FAILURE);
+    } else {
+        // Parent process
+        close(pipefd[0]);
+        dprintf(pipefd[1], "set limit { table-entries %d }\n", *value);
+        close(pipefd[1]);
+        waitpid(pid, NULL, 0);
     }
 }
-void run_quiet(const char *command) {
-    int ret = system(command);
-    if (ret == -1) {
-        perror("system");
+
+void run_quiet(const char *cmd_path, char *const argv[]) {
+    pid_t pid = fork();
+    if (pid == -1) {
+        perror("fork");
+        return;
+    } else if (pid == 0) {
+        // Redirect output to /dev/null
+        freopen("/dev/null", "w", stdout);
+        freopen("/dev/null", "w", stderr);
+        execvp(cmd_path, argv);
+        perror("execvp");
+        _exit(EXIT_FAILURE);
+    } else {
+        waitpid(pid, NULL, 0);
     }
 }
+
 int main(int argc, char *argv[]) {
     if (geteuid() != 0) {
         fprintf(stderr, "This program must be run as root.\n");
@@ -104,6 +144,7 @@ int main(int argc, char *argv[]) {
     }
     return EXIT_SUCCESS;
 }
+
 void start_function(void) {
     int original_entries = get_table_entries();
     if (original_entries == -1) {
@@ -120,6 +161,7 @@ void start_function(void) {
         fprintf(stderr, "Error: Failed to load PF tables.\n");
     }
 }
+
 void stop_function(void) {
     int original_entries;
     if (load_original_entries(&original_entries) != 0) {
@@ -132,11 +174,15 @@ void stop_function(void) {
         fprintf(stderr, "Error: Failed to flush PF tables.\n");
     }
 }
+
 void update_function(void) {
     printf("Retrieving updates.\nPlease wait...\n");
     retrieve_main();
-    system("pfpb stop >/dev/null");
-    system("pfpb start >/dev/null");
+    // Run `pfpb stop` and `pfpb start` quietly
+    char *stop_argv[] = { "pfpb", "stop", NULL };
+    char *start_argv[] = { "pfpb", "start", NULL };
+    run_quiet("pfpb", stop_argv);
+    run_quiet("pfpb", start_argv);
     printf("Updating is complete.\n");
     pfcount_main();
 }
