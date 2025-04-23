@@ -5,16 +5,21 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/stat.h>
+
 #define OUTPUT_DIR "/tmp/"
+
 // Function prototype for copy_main
 extern int copy_main(void);
+
 // Function prototype for initialize_curl_handle
 CURL *initialize_curl_handle(void);
+
 // Function to write data to the file
 static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
     size_t written = fwrite(ptr, size, nmemb, (FILE *)stream);
     return written;
 }
+
 // Function to remove trailing whitespace from a string
 void trim_trailing_whitespace(char *str) {
     char *end = str + strlen(str) - 1;
@@ -23,6 +28,7 @@ void trim_trailing_whitespace(char *str) {
         end--;
     }
 }
+
 // Function to initialize curl handle with settings
 CURL *initialize_curl_handle(void) {
     CURL *curl_handle = curl_easy_init();
@@ -35,6 +41,7 @@ CURL *initialize_curl_handle(void) {
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_data);
     return curl_handle;
 }
+
 int retrieve(const char *name, const char *url) {
     CURL *curl_handle;
     char gzip_path[1024];
@@ -69,18 +76,21 @@ int retrieve(const char *name, const char *url) {
     curl_global_cleanup();
     return 0;
 }
+
 int retrieve_main(void) {
     FILE *config_file = fopen("/var/pfpb/config.txt", "r");
     if (!config_file) {
         perror("Error opening config file");
         return 1;
     }
+    
     // Ensure the output directory exists
     if (access(OUTPUT_DIR, F_OK) != 0 && mkdir(OUTPUT_DIR, 0755) != 0) {
         perror("Failed to create output directory");
         fclose(config_file);
         return 1;
     }
+    
     char line[1024];
     while (fgets(line, sizeof(line), config_file)) {
         trim_trailing_whitespace(line);
@@ -92,6 +102,7 @@ int retrieve_main(void) {
             fprintf(stderr, "Malformed line in config file: %s\n", line);
         }
     }
+    
     fclose(config_file);
     copy_main();
     return 0;
