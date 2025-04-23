@@ -5,15 +5,20 @@
 #include <string.h>
 #include <ctype.h>
 #include <sys/stat.h>
+
 #define OUTPUT_DIR "/tmp/"
+
 // Function prototype for copy_main
 extern int copy_main(void);
+
 // Function prototype for initialize_curl_handle
 CURL *initialize_curl_handle(void);
+
 // Function to write data to the file
 static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
     return fwrite(ptr, size, nmemb, (FILE *)stream);
 }
+
 // Function to remove trailing whitespace from a string
 void trim_trailing_whitespace(char *str) {
     char *end = str + strlen(str) - 1;
@@ -22,6 +27,7 @@ void trim_trailing_whitespace(char *str) {
         end--;
     }
 }
+
 // Function to initialize curl handle with settings
 CURL *initialize_curl_handle(void) {
     CURL *curl_handle = curl_easy_init();
@@ -33,13 +39,15 @@ CURL *initialize_curl_handle(void) {
     curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_data);
     return curl_handle;
 }
+
 // Validate that the URL begins with http:// or https://
 int is_valid_url(const char *url) {
     return strncmp(url, "http://", 7) == 0 || strncmp(url, "https://", 8) == 0;
 }
+
 // Check whether the URL belongs to an allowed domain
 int is_allowed_domain(const char *url) {
-    const char *trusted_domains[] = {
+    const char * const trusted_domains[] = {
         "http://list.iblocklist.com/",
         "https://example.com/"
         // Add more trusted domains here
@@ -52,6 +60,8 @@ int is_allowed_domain(const char *url) {
     }
     return 0;
 }
+
+// Function to retrieve and save a URL to a .gz file
 int retrieve(const char *name, const char *url) {
     CURL *curl_handle;
     char gzip_path[1024];
@@ -81,6 +91,8 @@ int retrieve(const char *name, const char *url) {
     curl_global_cleanup();
     return 0;
 }
+
+// Main function to read config file and retrieve URLs
 int retrieve_main(void) {
     FILE *config_file = fopen("/var/pfpb/config.txt", "r");
     if (!config_file) {
@@ -95,8 +107,10 @@ int retrieve_main(void) {
     char line[1024];
     while (fgets(line, sizeof(line), config_file)) {
         trim_trailing_whitespace(line);
-        char *url = strtok(line, ";");
-        char *name = strtok(NULL, ";\n");
+        // strtok_r version to avoid thread-unsafe strtok
+        char *saveptr = NULL;
+        char *url = strtok_r(line, ";", &saveptr);
+        char *name = strtok_r(NULL, ";\n", &saveptr);
         if (url && name) {
             if (!is_valid_url(url)) {
                 fprintf(stderr, "Blocked invalid URL format: %s\n", url);
