@@ -1,5 +1,5 @@
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -pedantic -O2 -pipe -march=native --std=c17 -march=native -fPIC -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Wformat-security -flto -fvisibility=hidden -fno-common -Wshadow -fstrict-aliasing -Wuninitialized
+CFLAGS = -Wall -Wextra -Werror -pedantic -O2 -pipe -march=native --std=c17 -fPIC -D_FORTIFY_SOURCE=2 -fstack-protector-strong -Wformat -Wformat-security -flto -fvisibility=hidden -fno-common -Wshadow -fstrict-aliasing -Wuninitialized
 CFLAGS_RETRIEVE = $(CFLAGS) `pkg-config --cflags libcurl`
 LDFLAGS_RETRIEVE = `pkg-config --libs libcurl`
 LDFLAGS = -Wl,-O1,--sort-common,--as-needed,-z,relro,-z,now,-lssl,-lcrypto,-lz -fPIE -pie -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now $(LDFLAGS_RETRIEVE)
